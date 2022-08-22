@@ -1,6 +1,17 @@
-console.log('zh');
 export default {
 	yuyan: {
+		Chinese: '中文',
+		English: '英文',
+		Chinese: '中文',
+		English: '英文',
+		Chinese: '中文',
+		English: '英文',
+		Chinese: '中文',
+		English: '英文',
+		Chinese: '中文',
+		English: '英文',
+		Chinese: '中文',
+		English: '英文',
 		Chinese: '中文',
 		English: '英文'
 	},
@@ -20,7 +31,8 @@ export default {
 		ksrz: '开始认证',
 		sfyrz: '身份已认证',
 		xtjj: '系统简介',
-		jjxq: 'DID属于统一资源标识符URI的一种,是一个永久不可变的字符串,它存在的意义有两点，第一，标记任何目标对象(DID Subject),可以是一个人、一件商品、一台机器或者一只动物等等:第二,DID是通过DIDURL关联到描述目标对象的文件(DID Document,简称DID Doc)唯一标识符,即通过DID能够在数据库中搜索到具体的DID Doc。 创建一个DID Document的过程是Production,而将创建的这条Document引用至该DIDSubject其他DID'
+		jjxq: 'DID属于统一资源标识符URI的一种,是一个永久不可变的字符串,它存在的意义有两点，第一，标记任何目标对象(DID Subject),可以是一个人、一件商品、一台机器或者一只动物等等:第二,DID是通过DIDURL关联到描述目标对象的文件(DID Document,简称DID Doc)唯一标识符,即通过DID能够在数据库中搜索到具体的DID Doc。 创建一个DID Document的过程是Production,而将创建的这条Document引用至该DIDSubject其他DID',
+		tuijianren: '检测到您暂无推荐关系，为了账户安全性请前往绑定推荐关系'
 	},
 	authentication: {
 		list: {

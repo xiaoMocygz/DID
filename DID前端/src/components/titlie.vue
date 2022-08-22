@@ -14,8 +14,11 @@ export default {
 			this.$emit('goBack');
 		}
 	},
-	created() {
-		console.log(this.title);
+	created() {},
+	computed: {
+		cachesFormSele() {
+			return JSON.parse(JSON.stringify(this.$router));
+		}
 	}
 };
 </script>

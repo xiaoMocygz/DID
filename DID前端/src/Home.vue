@@ -33,7 +33,7 @@
 				</div>
 			</div>
 		</van-popup>
-		<van-popup v-model="show1" get-container="#nav" position="right" class="pop1" :overlay="false">
+		<van-popup v-model="show1" get-container="#nav" position="right" class="pop1">
 			<div class="content">
 				<div class="item" v-for="(item, index) in list1" :key="index" @click="listClick(index)">
 					<p>
@@ -59,7 +59,23 @@ export default {
 			show: false,
 			show1: false,
 			flag2: true,
-			list1: [{ title: this.$t('yuyan.Chinese') }, { title: this.$t('yuyan.English') }],
+			show3: false,
+			list1: [
+				{ title: this.$t('yuyan.Chinese') },
+				{ title: this.$t('yuyan.English') },
+				{ title: this.$t('yuyan.Chinese') },
+				{ title: this.$t('yuyan.English') },
+				{ title: this.$t('yuyan.Chinese') },
+				{ title: this.$t('yuyan.English') },
+				{ title: this.$t('yuyan.Chinese') },
+				{ title: this.$t('yuyan.English') },
+				{ title: this.$t('yuyan.Chinese') },
+				{ title: this.$t('yuyan.English') },
+				{ title: this.$t('yuyan.Chinese') },
+				{ title: this.$t('yuyan.English') },
+				{ title: this.$t('yuyan.Chinese') },
+				{ title: this.$t('yuyan.English') }
+			],
 			list: [
 				{ title: this.$t('list.title0'), event: 'https://eotc.im' },
 				{ title: this.$t('list.title1'), event: 'https://fi.eotc.im/' },
@@ -151,17 +167,7 @@ export default {
 	components: {
 		transitionPage
 	},
-	created() {
-		this.$store.commit('setZH', 1);
-	},
-	watch: {
-		list: {
-			handle: function (val) {
-				console.log(val);
-			},
-			deep: true
-		}
-	},
+
 	computed: {
 		xxx() {
 			return this.$t('list');
@@ -243,10 +249,15 @@ export default {
 			display: flex;
 			justify-content: space-between;
 			align-items: center;
+
 			img {
 				width: 32px;
 				height: 32px;
 			}
+		}
+		.item {
+			display: flex;
+			justify-content: center;
 		}
 	}
 }

@@ -85,7 +85,7 @@ export default {
 			list: [
 				{ icon: 'icon-xinyongfen', name: '信用分明细' },
 				{ icon: 'icon-lianxifangshi', name: '身份信息' },
-				{ icon: 'icon-fukuanxinxi', name: '收付款信息', url: 'receiving' },
+				{ icon: 'icon-fukuanxinxi', name: '收付款信息', url: 'receiving/list' },
 				{ icon: 'icon-bangdinggongliandizhi', name: '各公链绑定地址', url: 'chain' },
 				{ icon: 'icon-bangdingxiangmu', name: '绑定各项目' },
 				{ icon: 'icon-lianxifangshi', name: '各社区联系方式' }
