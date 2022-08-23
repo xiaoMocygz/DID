@@ -3,9 +3,9 @@
 		<titles @goBack="goBack" :title="title"></titles>
 		<div class="content">
 			<van-cell-group :border="false" class="field">
-				<van-field :border="false" v-model="name" readonly label="姓名" name="naem" />
-				<van-field v-model="phone" :border="false" readonly type="number" name="phone" label="手机号" />
-				<van-field :border="false" v-model="ID" readonly label="证件号" name="ID" />
+				<van-field :border="false" v-model="name" readonly label="姓名" name="name" label-class="wenzi" />
+				<van-field v-model="phone" :border="false" readonly type="number" name="phone" label="手机号" label-class="wenzi" />
+				<van-field :border="false" v-model="ID" readonly label="证件号" name="ID" label-class="wenzi" />
 			</van-cell-group>
 			<p class="secondary">上传身份证</p>
 			<div class="idcard">
@@ -41,7 +41,7 @@ export default {
 			fileList2: '',
 			fileList3: '',
 			hintText: '',
-			title: '身份信息'
+			title: '身份认证'
 		};
 	},
 	mounted() {
@@ -90,6 +90,10 @@ export default {
 };
 </script>
 <style lang="less" scoped>
+/deep/ .van-field__label {
+	color: black;
+	font-weight: bold;
+}
 .content {
 	padding: 32px;
 	/deep/.van-cell {
@@ -152,4 +156,3 @@ export default {
 	}
 }
 </style>
->

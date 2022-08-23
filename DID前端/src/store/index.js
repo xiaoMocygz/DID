@@ -19,9 +19,7 @@ const mutations = {
 	setMerchantInfoMap(state, data) {
 		state.merchantInfoMap[data.it.odid] = data;
 	},
-	setZH(state, data) {
-		console.log(state, data);
-	},
+
 	setRoute() {
 		this.$router.back();
 	}

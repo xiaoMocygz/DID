@@ -11,6 +11,23 @@
 				{{ $t('home.jjxq') }}
 			</div>
 		</div>
+		<van-overlay :show="show" :key="1.3">
+			<div class="wrapper" @click.stop>
+				<div class="maskbox">
+					<div style="color: #333333">{{ $t('home.tuijianren') }}</div>
+					<div>
+						<p @click="show = false">取消</p>
+						<p @click="econfirmHandler">确定</p>
+					</div>
+					<img class="img" src="../../../public/img/13.png" alt="警告" />
+				</div>
+			</div>
+
+			<!-- <Popout :show="show3">
+        风险提示: <br />
+        合成后无论是否成功卡牌都将销毁
+      </Popout> -->
+		</van-overlay>
 	</div>
 </template>
 
@@ -19,12 +36,18 @@ export default {
 	data() {
 		return {
 			show: false,
-			flag1: false //认证
+			flag1: false, //认证
+			show: false
 		};
 	},
 	methods: {
+		/* 开始认证 */
 		ksrz() {
-			this.$router.push({ path: '/accountstate/erroridentity' });
+			//	this.show = true;
+			this.$router.push({ path: 'accountstate/identity' });
+		},
+		econfirmHandler() {
+			this.show = false;
 		}
 	}
 };
@@ -97,6 +120,64 @@ export default {
 		width: 25px;
 		height: 25px;
 		vertical-align: middle;
+	}
+}
+.wrapper {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+
+	.maskbox {
+		width: 590px;
+		background-color: #fff;
+		border-radius: 20px;
+		position: relative;
+
+		div {
+			&:nth-child(1) {
+				padding: 100px 30px 40px 30px;
+				color: #fc7542;
+				font-size: 32px;
+				line-height: 53px;
+				text-align: center;
+			}
+
+			&:nth-child(2) {
+				width: 100%;
+				height: 95px;
+				line-height: 95px;
+				display: flex;
+				align-items: center;
+				font-size: 32px;
+				border-top: 1px solid #f3f4f5;
+
+				p {
+					flex: 1;
+					text-align: center;
+					font-size: 32px;
+					height: 100%;
+
+					&:nth-child(1) {
+						color: #666666;
+						border-right: 1px solid #f3f4f5;
+					}
+
+					&:nth-child(2) {
+						color: #1b2945;
+					}
+				}
+			}
+		}
+
+		.img {
+			width: 200px;
+			height: 200px;
+			position: absolute;
+			top: -25%;
+			left: 50%;
+			transform: translate(-50%, 0%);
+		}
 	}
 }
 </style>
