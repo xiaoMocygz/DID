@@ -29,7 +29,7 @@
         /// <summary>
         /// 推荐人
         /// </summary>
-        public int? RefUid
+        public string? RefUserId
         {
             get; set;
         }
@@ -43,7 +43,15 @@
         /// <summary>
         /// 验证码
         /// </summary>
-        public string Code
+        public string? Code
+        {
+            get; set;
+        }
+
+        /// <summary>
+        /// 密码（英文、数字 至少6位）
+        /// </summary>
+        public string Password
         {
             get; set;
         }

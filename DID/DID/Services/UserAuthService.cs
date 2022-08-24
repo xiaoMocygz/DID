@@ -20,39 +20,51 @@ namespace DID.Services
         /// 图片上传
         /// </summary>
         /// <param name="file"></param>
-        /// <param name="upload"></param>
+        /// <param name="userId"></param>
         /// <returns></returns>
-        Task<Response> UploadImage(IFormFile file, Upload upload);
+        Task<Response> UploadImage(IFormFile file, string userId);
 
         /// <summary>
         /// 获取未审核信息
         /// </summary>
-        /// <param name="uId"></param>
+        /// <param name="userId"></param>
         /// <returns></returns>
-        Task<Response<List<UserAuthRespon>>> GetUnauditedInfo(int uId);
+        Task<Response<List<UserAuthRespon>>> GetUnauditedInfo(string userId);
 
         /// <summary>
         /// 获取已审核审核信息
         /// </summary>
-        /// <param name="uId"></param>
+        /// <param name="userId"></param>
         /// <returns></returns>
-        Task<Response<List<UserAuthRespon>>> GetAuditedInfo(int uId);
+        Task<Response<List<UserAuthRespon>>> GetAuditedInfo(string userId);
 
         /// <summary>
         /// 获取打回信息
         /// </summary>
-        /// <param name="uId"></param>
+        /// <param name="userId"></param>
         /// <returns></returns>
-        Task<Response<List<UserAuthRespon>>> GetBackInfo(int uId);
+        Task<Response<List<UserAuthRespon>>> GetBackInfo(string userId);
 
         /// <summary>
         /// 审核
         /// </summary>
         /// <param name="userAuthInfoId"></param>
-        /// <param name="uId"></param>
+        /// <param name="userId"></param>
         /// <param name="auditType"></param>
         /// <returns></returns>
-        Task<Response> AuditInfo(string userAuthInfoId, int uId, AuditTypeEnum auditType);
+        Task<Response> AuditInfo(string userAuthInfoId, string userId, AuditTypeEnum auditType);
+        /// <summary>
+        /// 获取用户审核成功信息
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        Task<Response<AuthSuccessRespon>> GetAuthSuccess(string userId);
+        /// <summary>
+        /// 获取用户审核失败信息
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        Task<Response<AuthFailRespon>> GetAuthFail(string userId);
     }
     /// <summary>
     /// 审核认证服务
@@ -74,14 +86,14 @@ namespace DID.Services
         /// 审核
         /// </summary>
         /// <param name="userAuthInfoId"></param>
-        /// <param name="uId"></param>
+        /// <param name="userId"></param>
         /// <param name="auditType"></param>
         /// <returns></returns>
-        public async Task<Response> AuditInfo(string userAuthInfoId, int uId, AuditTypeEnum auditType)
+        public async Task<Response> AuditInfo(string userAuthInfoId, string userId, AuditTypeEnum auditType)
         {
             using var db = new NDatabase();
             var authinfo = await db.SingleByIdAsync<UserAuthInfo>(userAuthInfoId);
-            var auth = await db.SingleOrDefaultAsync<Auth>("select * from Auth where UserAuthInfoId = @0 and AuditUid = @1;", userAuthInfoId, uId);
+            var auth = await db.SingleOrDefaultAsync<Auth>("select * from Auth where UserAuthInfoId = @0 and AuditUserId = @1;", userAuthInfoId, userId);
 
             auth.AuditType = auditType;
             auth.AuditDate = DateTime.Now;
@@ -92,12 +104,12 @@ namespace DID.Services
             //修改用户审核状态
             if (auth.AuditStep == AuditStepEnum.抽审 && auth.AuditType == AuditTypeEnum.审核通过)
             {
-                await db.ExecuteAsync("update DIDUser set AuthType = 2 where Uid = @0;", authinfo.CreatorId);
+                await db.ExecuteAsync("update DIDUser set AuthType = @1 where DIDUserId = @0;", authinfo.CreatorId, AuthTypeEnum.审核成功);
             }
             else if (auth.AuditType != AuditTypeEnum.审核通过)
             {
                 //修改用户审核状态
-                await db.ExecuteAsync("update DIDUser set AuthType = 3,UserAuthInfoId = null where Uid = @0;", authinfo.CreatorId);
+                await db.ExecuteAsync("update DIDUser set AuthType = @1 where DIDUserId = @0;", authinfo.CreatorId, AuthTypeEnum.审核失败);
                 //todo: 审核失败 扣分
             }
 
@@ -108,7 +120,7 @@ namespace DID.Services
                 {
                     AuthId = Guid.NewGuid().ToString(),
                     UserAuthInfoId = userAuthInfoId,
-                    AuditUid = await db.SingleOrDefaultAsync<int>("select RefUid from DIDUser where Uid = @0", uId),//推荐人审核                                                                                //HandHeldImage = "Images/AuthImges/" + info.CreatorId + "/" + info.HandHeldImage,
+                    AuditUserId = await db.SingleOrDefaultAsync<string>("select RefUserId from DIDUser where DIDUserId = @0", userId),//推荐人审核                                                                                //HandHeldImage = "Images/AuthImges/" + info.CreatorId + "/" + info.HandHeldImage,
                     CreateDate = DateTime.Now,
                     AuditType = AuditTypeEnum.未审核,
                     AuditStep = AuditStepEnum.二审
@@ -132,7 +144,7 @@ namespace DID.Services
                 {
                     AuthId = Guid.NewGuid().ToString(),
                     UserAuthInfoId = userAuthInfoId,
-                    AuditUid = await db.SingleOrDefaultAsync<int>("select RefUid from DIDUser where Uid = @0", uId),//推荐人审核                                                                                //HandHeldImage = "Images/AuthImges/" + info.CreatorId + "/" + info.HandHeldImage,
+                    AuditUserId = await db.SingleOrDefaultAsync<string>("select RefUserId from DIDUser where DIDUserId = @0", userId),//推荐人审核                                                                                //HandHeldImage = "Images/AuthImges/" + info.CreatorId + "/" + info.HandHeldImage,
                     CreateDate = DateTime.Now,
                     AuditType = AuditTypeEnum.未审核,
                     AuditStep = AuditStepEnum.抽审
@@ -159,18 +171,35 @@ namespace DID.Services
         /// <summary>
         /// 获取已审核审核信息
         /// </summary>
-        /// <param name="uId"></param>
+        /// <param name="userId"></param>
         /// <returns></returns>
-        public async Task<Response<List<UserAuthRespon>>> GetAuditedInfo(int uId)
+        public async Task<Response<List<UserAuthRespon>>> GetAuditedInfo(string userId)
         {
             var result = new List<UserAuthRespon>();
             using var db = new NDatabase();
-            var items = await db.FetchAsync<Auth>("select * from Auth where AuditUid = @0 and AuditType != 0", uId);
+            var items = await db.FetchAsync<Auth>("select * from Auth where AuditUserId = @0 and AuditType != 0", userId);
             foreach (var item in items)
             {
                 var authinfo = await db.SingleOrDefaultAsync<UserAuthRespon>("select * from UserAuthInfo where UserAuthInfoId = @0",item.UserAuthInfoId);
+                authinfo.PortraitImage = item.PortraitImage;
+                authinfo.NationalImage = item.NationalImage;
+                authinfo.HandHeldImage = item.HandHeldImage;
                 var auths = await db.FetchAsync<Auth>("select * from Auth where UserAuthInfoId = @0 order by AuditStep", item.UserAuthInfoId);
-                authinfo.Auths = auths;
+                var list = new List<AuthInfo>();
+                foreach (var auth in auths)
+                {
+                    list.Add(new AuthInfo()
+                    {
+                        UId = await db.SingleOrDefaultAsync<int>("select Uid from DIDUser where DIDUserId = @0", auth.AuditUserId),
+                        AuditStep = auth.AuditStep,
+                        AuthDate = auth.AuditDate,
+                        Name = await db.SingleOrDefaultAsync<string>("select b.Name from DIDUser a left join UserAuthInfo b on  a.UserAuthInfoId = b.UserAuthInfoId where a.DIDUserId = @0", auth.AuditUserId),
+                        AuditType = auth.AuditType,
+                        Remark = auth.Remark
+                    }) ;
+                
+                }
+                authinfo.Auths = list;
                 result.Add(authinfo);
             }
             return InvokeResult.Success(result);
@@ -179,18 +208,35 @@ namespace DID.Services
         /// <summary>
         /// 获取未审核信息
         /// </summary>
-        /// <param name="uId"></param>
+        /// <param name="userId"></param>
         /// <returns></returns>
-        public async Task<Response<List<UserAuthRespon>>> GetUnauditedInfo(int uId)
+        public async Task<Response<List<UserAuthRespon>>> GetUnauditedInfo(string userId)
         {
             var result = new List<UserAuthRespon>();
             using var db = new NDatabase();
-            var items = await db.FetchAsync<Auth>("select * from Auth where AuditUid = @0 and AuditType = 0", uId);
+            var items = await db.FetchAsync<Auth>("select * from Auth where AuditUserId = @0 and AuditType = 0", userId);
             foreach (var item in items)
             {
                 var authinfo = await db.SingleOrDefaultAsync<UserAuthRespon>("select * from UserAuthInfo where UserAuthInfoId = @0", item.UserAuthInfoId);
+                authinfo.PortraitImage = item.PortraitImage;
+                authinfo.NationalImage = item.NationalImage;
+                authinfo.HandHeldImage = item.HandHeldImage;
                 var auths = await db.FetchAsync<Auth>("select * from Auth where UserAuthInfoId = @0 order by AuditStep", item.UserAuthInfoId);
-                authinfo.Auths = auths;
+                var list = new List<AuthInfo>();
+                foreach (var auth in auths)
+                {
+                    list.Add(new AuthInfo()
+                    {
+                        UId = await db.SingleOrDefaultAsync<int>("select Uid from DIDUser where DIDUserId = @0", auth.AuditUserId),
+                        AuditStep = auth.AuditStep,
+                        AuthDate = auth.AuditDate,
+                        Name = await db.SingleOrDefaultAsync<string>("select b.Name from DIDUser a left join UserAuthInfo b on  a.UserAuthInfoId = b.UserAuthInfoId where a.DIDUserId = @0", auth.AuditUserId),
+                        AuditType = auth.AuditType,
+                        Remark = auth.Remark
+                    });
+
+                }
+                authinfo.Auths = list;
                 result.Add(authinfo);
             }
             return InvokeResult.Success(result);
@@ -201,16 +247,32 @@ namespace DID.Services
         /// </summary>
         /// <param name="uId"></param>
         /// <returns></returns>
-        public async Task<Response<List<UserAuthRespon>>> GetBackInfo(int uId)
+        public async Task<Response<List<UserAuthRespon>>> GetBackInfo(string userId)
         {
             var result = new List<UserAuthRespon>();
             using var db = new NDatabase();
-            var items = await db.FetchAsync<Auth>("select * from Auth where AuditUid = @0", uId);
+            var items = await db.FetchAsync<Auth>("select * from Auth where AuditUserId = @0", userId);
             foreach (var item in items)
             {
                 var authinfo = await db.SingleOrDefaultAsync<UserAuthRespon>("select * from UserAuthInfo where UserAuthInfoId = @0", item.UserAuthInfoId);
+                authinfo.PortraitImage = item.PortraitImage;
+                authinfo.NationalImage = item.NationalImage;
+                authinfo.HandHeldImage = item.HandHeldImage;
                 var auths = await db.FetchAsync<Auth>("select * from Auth where UserAuthInfoId = @0 order by AuditStep", item.UserAuthInfoId);
-                authinfo.Auths = auths;
+                var list = new List<AuthInfo>();
+                foreach (var auth in auths)
+                {
+                    list.Add(new AuthInfo()
+                    {
+                        UId = await db.SingleOrDefaultAsync<int>("select Uid from DIDUser where DIDUserId = @0", auth.AuditUserId),
+                        AuditStep = auth.AuditStep,
+                        AuthDate = auth.AuditDate,
+                        Name = await db.SingleOrDefaultAsync<string>("select b.Name from DIDUser a left join UserAuthInfo b on  a.UserAuthInfoId = b.UserAuthInfoId where a.DIDUserId = @0", auth.AuditUserId),
+                        AuditType = auth.AuditType,
+                        Remark = auth.Remark
+                    });
+                }
+                authinfo.Auths = list;
                 var next = auths.Where(a => a.AuditStep == item.AuditStep + 1).ToList();
                 if (next.Count > 0 && (next[0].AuditType != AuditTypeEnum.未审核 && next[0].AuditType != AuditTypeEnum.审核通过))
                     result.Add(authinfo);
@@ -240,12 +302,12 @@ namespace DID.Services
         /// <param name="upload"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<Response> UploadImage(IFormFile file, Upload upload)
+        public async Task<Response> UploadImage(IFormFile file, string userId)
         {
             try
             {
                 var dir = new DirectoryInfo(Path.Combine(
-                    AppDomain.CurrentDomain.BaseDirectory, "Images/AuthImges/" + upload.UId + "/"));
+                    AppDomain.CurrentDomain.BaseDirectory, "Images/AuthImges/" + userId + "/"));
                 
                 //保存目录不存在就创建这个目录
                 if (!dir.Exists)
@@ -284,15 +346,18 @@ namespace DID.Services
             //info.HandHeldImage = "Images/AuthImges/" + info.CreatorId + "/" + info.HandHeldImage;
 
             using var db = new NDatabase();
-            var list = await db.SingleOrDefaultAsync<string>("select UserAuthInfoId from DIDUSer where Uid =@0", info.CreatorId);
-            if(!string.IsNullOrEmpty(list))
+            //var list = await db.SingleOrDefaultAsync<string>("select UserAuthInfoId from DIDUSer where Uid =@0", info.CreatorId);
+            //if(!string.IsNullOrEmpty(list))
+            //    return InvokeResult.Fail("请勿重复提交!");
+            var str = await db.SingleOrDefaultAsync<AuthTypeEnum>("select AuthType from DIDUser where DIDUserId = @0", info.CreatorId);
+            if (str != AuthTypeEnum.未审核)
                 return InvokeResult.Fail("请勿重复提交!");
 
             var auth = new Auth
             {
                 AuthId = Guid.NewGuid().ToString(),
                 UserAuthInfoId = info.UserAuthInfoId,
-                AuditUid = await db.SingleOrDefaultAsync<int>("select RefUid from DIDUser where Uid = @0", info.CreatorId),//推荐人审核
+                AuditUserId = await db.SingleOrDefaultAsync<string>("select RefUserId from DIDUser where DIDUserId = @0", info.CreatorId),//推荐人审核
                 //HandHeldImage = "Images/AuthImges/" + info.CreatorId + "/" + info.HandHeldImage,
                 CreateDate = DateTime.Now,
                 AuditType = AuditTypeEnum.未审核,
@@ -312,7 +377,7 @@ namespace DID.Services
             db.BeginTransaction();
             await db.InsertAsync(info);
             await db.InsertAsync(auth);
-            await db.ExecuteAsync("update DIDUser set UserAuthInfoId = @0,AuthType = 1 where Uid = @1", info.UserAuthInfoId, info.CreatorId);//更新用户当前认证编号 审核中
+            await db.ExecuteAsync("update DIDUser set UserAuthInfoId = @0,AuthType = @2 where DIDUserId = @1", info.UserAuthInfoId, info.CreatorId, AuthTypeEnum.审核中);//更新用户当前认证编号 审核中
             db.CompleteTransaction();
 
             //两小时没人审核 自动到Dao审核
@@ -329,5 +394,64 @@ namespace DID.Services
 
             return InvokeResult.Success("提交成功!");
         }
+
+        /// <summary>
+        /// 获取用户审核成功信息
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public async Task<Response<AuthSuccessRespon>> GetAuthSuccess(string userId)
+        {
+            using var db = new NDatabase();
+            var item = new AuthSuccessRespon();
+            var authinfo = await db.SingleOrDefaultAsync<UserAuthInfo>("select b.* from DIDUser a left join UserAuthInfo b on  a.UserAuthInfoId = b.UserAuthInfoId where a.DIDUserId = @0", userId);
+            if (authinfo == null) InvokeResult.Success("认证信息未找到!");
+            item.Name = authinfo!.Name;
+            item.PhoneNum = authinfo.PhoneNum;
+            item.IdCard = authinfo.IdCard;
+            item.RefUid = await db.SingleOrDefaultAsync<string>("select b.Name from DIDUser a left join UserAuthInfo b on  a.UserAuthInfoId = b.UserAuthInfoId" +
+                " where a.DIDUserId = (select RefUserId from DIDUser where DIDUserId = @0)", userId);
+            item.Mail = await db.SingleOrDefaultAsync<string>("select Mail from DIDUser where DIDUserId =@0", userId);
+            var auths = await db.FetchAsync<Auth>("select * from Auth where UserAuthInfoId = @0 order by AuditStep", authinfo.UserAuthInfoId);
+            var list = new List<AuthInfo>();
+            foreach (var auth in auths)
+            {
+                list.Add(new AuthInfo()
+                {
+                    UId = await db.SingleOrDefaultAsync<int>("select Uid from DIDUser where DIDUserId = @0", auth.AuditUserId),
+                    AuditStep = auth.AuditStep,
+                    AuthDate = auth.AuditDate,
+                    Name = await db.SingleOrDefaultAsync<string>("select b.Name from DIDUser a left join UserAuthInfo b on  a.UserAuthInfoId = b.UserAuthInfoId where a.DIDUserId = @0", auth.AuditUserId),
+                    AuditType = auth.AuditType,
+                    Remark = auth.Remark
+                });
+            }
+            item.Auths = list;
+            return InvokeResult.Success(item);
+        }
+
+        /// <summary>
+        /// 获取用户审核失败信息
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public async Task<Response<AuthFailRespon>> GetAuthFail(string userId)
+        {
+            using var db = new NDatabase();
+            var item = new AuthFailRespon();
+            var authinfo = await db.SingleOrDefaultAsync<UserAuthInfo>("select b.* from DIDUser a left join UserAuthInfo b on  a.UserAuthInfoId = b.UserAuthInfoId where a.DIDUserId = @0", userId);
+            if (authinfo == null) InvokeResult.Success("认证信息未找到!");
+            item.Name = authinfo!.Name;
+            item.PhoneNum = authinfo.PhoneNum;
+            item.IdCard = authinfo.IdCard;
+            item.NationalImage = authinfo.NationalImage;
+            item.PortraitImage = authinfo.PortraitImage;
+            item.HandHeldImage = authinfo.HandHeldImage;
+            var auths = await db.FetchAsync<Auth>("select * from Auth where UserAuthInfoId = @0 order by AuditStep Desc", authinfo.UserAuthInfoId);
+            if (auths == null) InvokeResult.Success("认证信息未找到!");
+            item.Remark = auths[0].Remark;
+            item.AuditType = auths[0].AuditType;
+            return InvokeResult.Success(item);
+        }  
     }
 }

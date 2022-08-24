@@ -3,19 +3,34 @@
 namespace DID.Entitys
 {
     /// <summary>
-    /// 身份认证状态 0 未认证 1 已认证
+    /// 身份认证状态 0 未审核 1 审核中 2 审核成功 3 审核失败
     /// </summary>
-    public enum AuthTypeEnum { 未认证, 已认证 }
+    public enum AuthTypeEnum { 未审核, 审核中, 审核成功, 审核失败 }
     /// <summary>
     /// 用户信息表
     /// </summary>
+    //[PrimaryKey("DIDUserId", AutoIncrement = false)]
     [PrimaryKey("Uid")]
     public class DIDUser
     {
         /// <summary>
         /// 用户编号
         /// </summary>
+        public string DIDUserId
+        {
+            get; set;
+        }
+        /// <summary>
+        /// Uid
+        /// </summary>
         public int Uid
+        {
+            get; set;
+        }
+        /// <summary>
+        /// 密码（英文、数字 至少6 - 18位）
+        /// </summary>
+        public string PassWord
         {
             get; set;
         }
@@ -42,7 +57,7 @@ namespace DID.Entitys
         //}
 
         /// <summary>
-        /// 身份认证状态 0 未认证 1 已认证
+        /// 身份认证状态 0 未审核 1 审核中 2 审核成功 3 审核失败
         /// </summary>
         public AuthTypeEnum AuthType
         {
@@ -73,7 +88,7 @@ namespace DID.Entitys
         /// <summary>
         /// 推荐人
         /// </summary>
-        public int? RefUid
+        public string? RefUserId
         {
             get; set;
         }
@@ -84,7 +99,42 @@ namespace DID.Entitys
         {
             get; set;
         }
+        /// <summary>
+        /// 注册时间
+        /// </summary>
+        public DateTime RegDate
+        {
+            get; set;
+        }
+        /// <summary>
+        /// 上次登录时间
+        /// </summary>
+        public DateTime? LoginDate
+        {
+            get; set;
+        }
+        /// <summary>
+        /// 电报群
+        /// </summary>
+        public string? Telegram
+        {
+            get; set;
+        }
 
+        /// <summary>
+        /// 国家
+        /// </summary>
+        public string? Country
+        {
+            get; set;
+        }
 
+        /// <summary>
+        /// 地区
+        /// </summary>
+        public string? Area
+        {
+            get; set;
+        }
     }
 }

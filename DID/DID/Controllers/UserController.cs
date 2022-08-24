@@ -41,11 +41,31 @@ namespace DID.Controllers
         /// 获取用户信息
         /// </summary>
         /// <returns></returns>
+        /// <param name="uid"></param>
         [HttpGet]
         [Route("getuserinfo")]
-        public async Task<Response<UserInfoRespon>> GetUserInfo(int uId)
+        public async Task<Response<UserInfoRespon>> GetUserInfo(/*int uid*/)
         {
-            return await _service.GetUserInfo(uId);
+            var userId = HttpContext.User.Claims.FirstOrDefault(a => a.Type == "UserId")?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return InvokeResult.Fail<UserInfoRespon>("用户未找到!");
+            return await _service.GetUserInfo(userId);
+        }
+
+        /// <summary>
+        /// 更新用户信息（邀请人 电报群 国家地区）
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("setuserinfo")]
+        public async Task<Response> SetUserInfo(UserInfoRespon user)
+        {
+            var userId = HttpContext.User.Claims.FirstOrDefault(a => a.Type == "UserId")?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return InvokeResult.Fail<UserInfoRespon>("用户未找到!");
+            user.UserId = userId;
+            return await _service.SetUserInfo(user);
         }
 
         /// <summary>
@@ -60,9 +80,9 @@ namespace DID.Controllers
         {
            if (!CommonHelp.IsMail(login.Mail))
                 return InvokeResult.Fail<string>("邮箱格式错误!");
-            var code = _cache.Get(login.Mail)?.ToString();
-            if (code != login.Code)
-                return InvokeResult.Fail<string>("验证码错误!");
+            //var code = _cache.Get(login.Mail)?.ToString();
+            //if (code != login.Code)
+            //    return InvokeResult.Fail<string>("验证码错误!");
             return await _service.Login(login);
         }
 

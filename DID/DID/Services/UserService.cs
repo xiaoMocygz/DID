@@ -3,6 +3,7 @@ using DID.Helps;
 using DID.Models;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
+using NPoco;
 using System.Drawing;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -20,7 +21,14 @@ namespace DID.Services
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        Task<Response<UserInfoRespon>> GetUserInfo(int userId);
+        Task<Response<UserInfoRespon>> GetUserInfo(string userId);
+
+        /// <summary>
+        /// 更新用户信息（邀请人 电报群 国家地区）
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        Task<Response> SetUserInfo(UserInfoRespon user);
 
         /// <summary>
         /// 登录
@@ -72,14 +80,57 @@ namespace DID.Services
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public async Task<Response<UserInfoRespon>> GetUserInfo(int userId)
+        public async Task<Response<UserInfoRespon>> GetUserInfo(string userId)
+        {
+            var userRespon = new UserInfoRespon();
+            using var db = new NDatabase();
+            var user = await db.SingleOrDefaultAsync<DIDUser>("select * from DIDUser where DIDUserId = @0", userId);
+
+            userRespon.Uid = user.Uid;
+            if(!string.IsNullOrEmpty(user.RefUserId))
+                userRespon.RefUid = await db.SingleOrDefaultAsync<int>("select Uid from DIDUser where DIDUserId = @0", user.RefUserId);
+            userRespon.CreditScore = user.CreditScore;
+            userRespon.Mail = user.Mail;
+            userRespon.Country = user.Country;
+            userRespon.Area = user.Area;
+            userRespon.Telegram = user.Telegram;
+            userRespon.AuthType = user.AuthType;
+            if (user.AuthType == AuthTypeEnum.审核成功)
+            {
+                var authInfo = await db.SingleOrDefaultByIdAsync<UserAuthInfo>(user.UserAuthInfoId);
+                userRespon.Name = authInfo.Name;
+                userRespon.PhoneNum = authInfo.PhoneNum;
+            }
+
+            return InvokeResult.Success(userRespon);
+        }
+
+        /// <summary>
+        /// 更新用户信息（邀请人 电报群 国家地区）
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        public async Task<Response> SetUserInfo(UserInfoRespon user)
         {
             using var db = new NDatabase();
-            var user = await db.SingleOrDefaultByIdAsync<DIDUser>(userId);
+            var sql = new Sql("update DIDUser set ");
+            if (!string.IsNullOrEmpty(user.RefUserId))
+            {
+                var refUserId = await db.SingleOrDefaultAsync<string>("select DIDUserId from DIDUser where DIDUserId = @0", user.RefUserId);
+                if (string.IsNullOrEmpty(refUserId) || user.UserId == refUserId)//不能修改为自己
+                    return InvokeResult.Fail("邀请码错误!");
+                sql.Append("RefUserId = @0, ", user.RefUserId);
+            }
+            if (!string.IsNullOrEmpty(user.Telegram))
+                sql.Append("Telegram = @0, ", user.Telegram);
+            if(!string.IsNullOrEmpty(user.Country))
+                sql.Append("Country = @0, ", user.Country);
+            if (!string.IsNullOrEmpty(user.Area))
+                sql.Append("Area = @0, ", user.Country);
+            sql.Append("DIDUserId = @0 where DIDUserId = @0 ", user.UserId);
 
-            return InvokeResult.Success(new UserInfoRespon() { Uid = user.Uid, AuthType = user?.AuthType, CreditScore = user?.CreditScore, Mail = user?.Mail });
-
+            await db.ExecuteAsync(sql);
+            return InvokeResult.Success("更新成功!");
         }
 
         /// <summary>
@@ -91,12 +142,22 @@ namespace DID.Services
         {
             //1.验证用户账号密码是否正确
             using var db = new NDatabase();
+            var user = await db.SingleOrDefaultAsync<DIDUser>("select * from DIDUser where Mail = @0", login.Mail);
 
-            var uid = await db.SingleOrDefaultAsync<string>("select Uid from Wallet where WalletAddress = @0 and Otype = @1 and Sign = @2", 
-                                                        login.WalletAddress, login.Otype, login.Sign );
+            if(null == user)
+                return InvokeResult.Fail<string>("邮箱未注册!");
 
-            if (string.IsNullOrEmpty(uid))
-                return InvokeResult.Fail<string>("登录失败!");
+            if (user.PassWord != login.Password)
+                return InvokeResult.Fail<string>("密码错误!");
+
+            var walletId = await db.SingleOrDefaultAsync<string>("select WalletId from Wallet where WalletAddress = @0 and Otype = @1 and Sign = @2 and DIDUserId = @3", 
+                                                        login.WalletAddress, login.Otype, login.Sign, user.DIDUserId);
+            if (string.IsNullOrEmpty(walletId))
+                return InvokeResult.Fail<string>("钱包错误!");
+
+            //更新登录时间
+            user.LoginDate = DateTime.Now;
+            await db.UpdateAsync(user);
 
             //2.生成JWT
             //Header,选择签名算法
@@ -104,7 +165,7 @@ namespace DID.Services
             //Payload,存放用户信息，下面我们放了一个用户id
             var claims = new[]
             {
-                new Claim("Uid",uid)
+                new Claim("UserId",user.DIDUserId)
             };
             //Signature
             //取出私钥并以utf8编码字节输出
@@ -124,6 +185,8 @@ namespace DID.Services
                 );
             //生成字符串token
             var TokenStr = new JwtSecurityTokenHandler().WriteToken(Token);
+
+
             return InvokeResult.Success<string>(TokenStr);
         }
 
@@ -138,30 +201,40 @@ namespace DID.Services
             using var db = new NDatabase();
 
             //var Uid = await db.SingleOrDefaultAsync<int>("select IDENT_CURRENT('DIDUser') + 1");//用户自增id
-            var uId = await db.SingleOrDefaultAsync<int>("select Uid from DIDUser where Mail = @0", login.Mail);
+            var userId = await db.SingleOrDefaultAsync<string>("select DIDUserId from DIDUser where Mail = @0", login.Mail);
             var walletId = await db.SingleOrDefaultAsync<string>("select WalletId from Wallet where WalletAddress = @0 and Otype = @1 and Sign = @2",
                                                         login.WalletAddress, login.Otype, login.Sign);
-            if (uId != 0 && !string.IsNullOrEmpty(walletId))
+            if (!string.IsNullOrEmpty(userId) || !string.IsNullOrEmpty(walletId))
                 return InvokeResult.Fail("请勿重复注册!");
 
+            if (!string.IsNullOrEmpty(login.RefUserId))
+            {
+                var refUserId = await db.SingleOrDefaultAsync<string>("select DIDUserId from DIDUser where DIDUserId = @0", login.RefUserId);
+                if (string.IsNullOrEmpty(refUserId))
+                    return InvokeResult.Fail("邀请码错误!");
+            }
+
             db.BeginTransaction();
+            userId = Guid.NewGuid().ToString();
             var user = new DIDUser
             {
-                //Uid = Uid,
-                AuthType = AuthTypeEnum.未认证,
+                DIDUserId = userId,
+                PassWord = login.Password,
+                AuthType = AuthTypeEnum.未审核,
                 CreditScore = 0,
                 Mail = login.Mail,
-                RefUid = login.RefUid == 0 ? null : login.RefUid,
-                UserNode = 0//啥也不是   
+                RefUserId = login.RefUserId ?? login.RefUserId,
+                UserNode = 0,//啥也不是
+                RegDate = DateTime.Now             
             };
             await db.InsertAsync(user);
-            uId = await db.SingleOrDefaultAsync<int>("select Uid from DIDUser where Mail = @0", login.Mail);//获取主键
+            //uId = await db.SingleOrDefaultAsync<int>("select Uid from DIDUser where Mail = @0", login.Mail);//获取主键
             var wallet = new Wallet {
                 WalletId = Guid.NewGuid().ToString(),
                 Otype = login.Otype,
                 Sign = login.Sign,
                 WalletAddress = login.WalletAddress,
-                Uid = uId
+                DIDUserId = userId
             };
             await db.InsertAsync(wallet);
             db.CompleteTransaction();

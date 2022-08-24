@@ -1,4 +1,6 @@
 ﻿using System.Drawing;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace DID.Helps
 {
@@ -24,6 +26,15 @@ namespace DID.Helps
         public static bool IsIDcard(string str_idcard)
         {
             return System.Text.RegularExpressions.Regex.IsMatch(str_idcard, @"(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)");
+        }
+        /// <summary>
+        /// 证件号验证
+        /// </summary>
+        /// <param name="str_idcard"></param>
+        /// <returns></returns>
+        public static bool IsCard(string str_idcard)
+        {
+            return System.Text.RegularExpressions.Regex.IsMatch(str_idcard, @"(^\d{7,18}$)|(^\d{17}(\d|X|x)$)");
         }
         /// <summary>
         /// 邮件验证
@@ -144,5 +155,27 @@ namespace DID.Helps
             }
             return image;
         }
+        /// <summary>
+        /// 字符串MD5加密
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static string Md5(string str)
+        {
+            //将字符串编码为字节序列
+            byte[] bt = Encoding.UTF8.GetBytes(str);
+            //创建默认实现的实例
+            var md5 = MD5.Create();
+            //计算指定字节数组的哈希值。
+            var md5bt = md5.ComputeHash(bt);
+            //将byte数组转换为字符串
+            var builder = new StringBuilder();
+            foreach (var item in md5bt)
+            {
+                builder.Append(item.ToString("X2"));
+            }
+            return builder.ToString();
+        }
+
     }
 }

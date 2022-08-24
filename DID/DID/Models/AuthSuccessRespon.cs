@@ -1,49 +1,47 @@
-﻿using NPoco;
+﻿using DID.Entitys;
 
-namespace DID.Entitys
+namespace DID.Models
 {
     /// <summary>
-    /// 钱包
+    /// 审核详情
     /// </summary>
-    [PrimaryKey("WalletId", AutoIncrement = false)]
-    public class Wallet
+    public class AuthSuccessRespon
     {
-
         /// <summary>
-        /// 编号
+        /// 用户姓名
         /// </summary>
-        public string WalletId
+        public string Name
         {
             get; set;
         }
         /// <summary>
-        /// 钱包地址
+        /// 手机号
         /// </summary>
-        public string WalletAddress
+        public string PhoneNum
         {
             get; set;
         }
         /// <summary>
-        /// 网络类型
+        /// 证件号
         /// </summary>
-        public string Otype
+        public string IdCard
+        {
+            get; set;
+        }
+        public string Mail { get; set; }
+        /// <summary>
+        /// 邀请人姓名
+        /// </summary>
+        public string RefUid
         {
             get; set;
         }
         /// <summary>
-        /// 签名
+        /// 审批记录
         /// </summary>
-        public string Sign
-        {
-            get; set;
-        }
-        /// <summary>
-        /// 用户编号
-        /// </summary>
-        public string DIDUserId
+        public List<AuthInfo>? Auths
         {
             get; set;
         }
     }
 }
-
