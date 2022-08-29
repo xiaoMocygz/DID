@@ -1,13 +1,10 @@
 
-
 // 0 0 0 trx
 function initFormData(data) {
     const formData = new FormData()
-
     for (const [key, value] of Object.entries(data)) {
         formData.append(key, value)
     }
-
     return formData
 }
 

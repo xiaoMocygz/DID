@@ -52,6 +52,10 @@ export default {
 		jfjl: '加分记录',
 		kfjl: '扣分记录',
 		sfwrz: '身份未认证',
-		sfyrz: '身份已认证'
+		sfyrz: '身份已认证',
+		tcts: '确定要退出当前账号吗？',
+		tcdl: '退出登录',
+		qr: '确认',
+		qx: '取消'
 	}
 };

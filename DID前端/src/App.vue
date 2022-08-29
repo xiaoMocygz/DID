@@ -39,6 +39,12 @@ export default {
 	--main-test-color: rgb(177, 177, 177);
 	--icon-size: 0.5rem;
 }
+  ::-webkit-scrollbar {
+     width: 0 !important;
+   }
+   ::-webkit-scrollbar {
+     width: 0 !important;height: 0;
+   }
 </style>
 
 <style lang="less">
@@ -50,10 +56,18 @@ export default {
 	overflow: hidden;
 	user-select: text !important;
 }
-
+html,
+body,
+#app {
+	height: 100%;
+}
 html,
 body {
 	font-family: 'PingFang SC', 'Microsoft YaHei', 'SimHei', 'Arial', 'SimSun' !important;
+}
+* {
+	padding: 0;
+	margin: 0;
 }
 
 p {

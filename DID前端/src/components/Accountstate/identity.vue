@@ -201,14 +201,7 @@ export default {
 			}
 		},
 		IDRule(val) {
-			let num = val.length;
-			if (num > 6 && num < 19) {
-				return true;
-			} else if (num == 18) {
-				return /^[1-8]{2}[0-9]{4}[0-9]{4}((0[1-9]{1})|(1[0-2]{1}))((0[1-9]{1})|(1[0-9]{1})|(2[0-9]{1})|(3[0-1]{1}))[0-9]{3}[0-9xX]{1}$/.test(val);
-			} else {
-				return false;
-			}
+			return /(^\d{7,18}$)|(^\d{17}(\d|X|x)$)/.test(val);
 		},
 		//表单验证失败
 		onFailed(errorInfo) {
@@ -244,11 +237,9 @@ export default {
 			// 	.catch((err) => {});
 		},
 		updata(item) {
-			this.$router.push({ path: '/accountstate/approved' });
-			// this.personShow = false;
-			// this.countryShow = true;
-			// this.countryShow = false;
-			// this.handShow = true;
+			//this.$router.push({ path: '/audit/index' });
+			//		this.personShow = false;
+			//	this.countryShow = true;
 			// this.personShow = false;
 			// this.handShow = true;
 			//-------------------------------
@@ -265,13 +256,11 @@ export default {
 			// } else if (this.handShow) {
 			// 	yanzheng = 3;
 			// }
-
 			// var fd = new FormData();
 			// fd.append('uid', localStorage.getItem('uid'));
 			// fd.append('ctype', yanzheng);
 			// fd.append('proof', item[0].file);
 			// fd.append('sign', this.sign);
-
 			// Update(fd).then((res) => {
 			// 	Toast.clear();
 			// 	let state = res.data.State;
