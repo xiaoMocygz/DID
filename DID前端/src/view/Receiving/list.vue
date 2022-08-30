@@ -33,13 +33,13 @@
 						<van-button square type="danger" text="删除" @click="delPaymentShou(receiving, index)" />
 					</template>
 				</van-swipe-cell> -->
-			<van-cell class="cell">
+			<van-cell class="cell" v-for="(item,index) in patternList" :key="item">
 				<template #icon>
-					<img class="pay-img" :src="require('../../../public/img/xianjin.png')" alt="aug-icon" />
+					<img class="pay-img" :src="require('../../../public/img/' + item.logo + '.png')" alt="aug-icon" />
 				</template>
 				<template #title>
 					<span class="custom-title"></span>
-					<div>现金支付</div>
+					<div>{{item.name}}</div>
 				</template>
 				<template #right-icon>
 					<!-- <van-switch v-model="receiving.checked" size="18px" /> -->
@@ -94,6 +94,7 @@ import { myPayment } from '@/api/payverification';
 
 import { SetPayType } from '@/api/payverification';
 import titles from '@/components/titlie.vue';
+import { Dialog } from 'vant';
 export default {
 	name: 'set-receivingList',
 	components: {
@@ -106,6 +107,7 @@ export default {
 	data() {
 		return {
 			checked: true,
+			currenSwitch:null,
 			title: '收付款信息',
 			showCurrencyType: false, // 选择货币类型 弹窗
 			currencyId: 'CNY',
@@ -114,6 +116,24 @@ export default {
 				{
 					validator: this.validator
 				}
+			],
+			patternList:[
+				{
+					name:'现金支付',
+					logo:'xianjin'
+				},
+				{
+					name:'工商银行',
+					logo:'xianjin'
+				},
+				{
+					name:'支付宝',
+					logo:'zhifubao'
+				},
+				{
+					name:'微信支付',
+					logo:'weixin'
+				},
 			],
 			addPaymentList: ['银行卡', '支付宝', '微信'],
 			defaultIndex: 0,
@@ -131,6 +151,16 @@ export default {
 		goBack() {
 			this.$router.back();
 		},
+		// isSwitch(index){
+		// 	if(this.currenSwitch===index){
+		// 		this.checked = !this.checked
+		// 		console.log(this.checked,this.currenSwitch);
+		// 	}else{
+		// 		this.checked = true
+		// 	}
+		// 	this.currenSwitch = index
+		// 	console.log(index,this.currenSwitch)
+		// },
 		onConfirm(value, index) {
 			//console.log(value);
 			this.addpayFlgClose();

@@ -2,7 +2,7 @@
 	<div>
 		<div class="container">
 			<img class="img4" src="../../../public/img/4.png" alt="" />
-			<img class="img5" src="../../../public/img/5.png" alt="" />
+			<img class="img5" src="../../../public/img/authentication.svg" alt="" />
 			<!-- <img class="img7" src="../../../public/img/7.png" alt="" /> -->
 			<div class="renzheng" @click="ksrz" v-show="!show1">{{ $t('home.ksrz') }} 
  
@@ -11,7 +11,8 @@
 			<div class="renzheng"  @click="sfyrz" v-show="show1"><img class="img11" src="../../../public/img/11.png" alt=""/> {{ $t('home.sfyrz') }}</div>
 			<div class="wenzi">{{ $t('home.xtjj') }}<img class="img8" src="../../../public/img/8.png" alt="" /></div>
 			<div class="wenzi1">
-				{{ $t('home.jjxq') }}
+				{{ $t('home.jjxq') }}<br />
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ $t('home.jjxq2') }}
 			</div>
 		</div>
 		<van-overlay :show="show" :key="1.3">
@@ -85,15 +86,14 @@ this.$on('telegramClick',(val)=>{
 	background-image: url('../../img/6.png');
 	box-sizing: border-box;
 	.img4 {
-    width: 100%;
+    width: 85%;
     height: auto;
 		
 	}
 	.img5 {
-    width: 100%;
-    height: auto;
-		margin: 200px 0;
-  
+		width: 85%;
+		height: auto;
+		margin: 210px 0;
 	}
 	.img7 {
 		width: 5.65rem;
@@ -123,7 +123,7 @@ this.$on('telegramClick',(val)=>{
 		box-sizing: border-box;
 		line-height: 8vw;
 		text-indent: 6.4vw;
-		font-size: 0.5rem;
+		font-size: 0.4rem;
 	}
 }
 .renzheng {

@@ -17,26 +17,27 @@ export default {
 	},
 	home: {
 		ksrz: 'Start certification',
-		sfyrz: '身份已认证',
-		xtjj: '系统简介',
-		jjxq: 'DID属于统一资源标识符URI的一种,是一个永久不可变的字符串,它存在的意义有两点，第一，标记任何目标对象(DID Subject),可以是一个人、一件商品、一台机器或者一只动物等等:第二,DID是通过DIDURL关联到描述目标对象的文件(DID Document,简称DID Doc)唯一标识符,即通过DID能够在数据库中搜索到具体的DID Doc。 创建一个DID Document的过程是Production,而将创建的这条Document引用至该DIDSubject其他DID'
+		sfyrz: 'Identity verified',
+		xtjj: 'introduction',
+		jjxq: 'DID is a type of Uniform Resource Identifier (URI), which is a permanent and immutable string. It has two meanings. First, it marks any target object (DID Subject), which can be a person, a commodity, a A machine or an animal, etc.: Second, DID is a unique identifier associated with a document (DID Document, DID Doc) describing the target object through DIDURL, that is, a specific DID Doc can be searched in the database through DID.',
+		jjxq2:'The process of creating a DID Document is Production, and referencing the created Document to the DIDSubject and other DID creation processes is Consumption. During the verification process, the DID Document corresponding to each DID is independent, which is equivalent to information isolation for each DID. During the verification process, the DID holder can authorize different DIDs as needed, and the verifier can only read the authorized DID Doc, but cannot obtain more information, so as to achieve the information protection purpose of the DID Subject.'
 	},
 	authentication: {
 		list: {
-			rzsh: '认证审核',
-			xyfmx: '信用分明细',
-			sfxx: '身份信息',
-			sfkxx: '收付款信息',
-			bddz: '各公链绑定地址',
-			bdxm: '绑定各项目',
-			lxfs: '各社区联系方式',
-			td: '团队'
+			rzsh: 'Certification audit',
+			xyfmx: 'credit score',
+			sfxx: 'Identity Information',
+			sfkxx: 'Payment information',
+			bddz: 'Binding address of each public chain',
+			bdxm: 'Bind each item',
+			lxfs: 'Community contact information',
+			td: 'team'
 		},
-		yrz: '已认证',
-		wrz: '未认证',
-		xyf: '信用分',
-		xypf: '信用评分',
-		jfjl: '加分记录',
-		kfjl: '扣分记录'
+		yrz: 'verified',
+		wrz: 'not certified',
+		xyf: 'credit score',
+		xypf: 'credit score',
+		jfjl: 'Extra points record',
+		kfjl: 'Deduction record'
 	}
 };
