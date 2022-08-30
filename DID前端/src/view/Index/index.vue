@@ -4,8 +4,11 @@
 			<img class="img4" src="../../../public/img/4.png" alt="" />
 			<img class="img5" src="../../../public/img/5.png" alt="" />
 			<!-- <img class="img7" src="../../../public/img/7.png" alt="" /> -->
-			<div class="renzheng" @click="ksrz">{{ $t('home.ksrz') }}</div>
-			<div class="renzheng"><img class="img11" src="../../../public/img/11.png" alt="" /> {{ $t('home.sfyrz') }}</div>
+			<div class="renzheng" @click="ksrz" v-show="!show1">{{ $t('home.ksrz') }} 
+ 
+      			<van-icon name="search" class="iconfont      icon-youjiantou" class-prefix="icon" />
+      </div>
+			<div class="renzheng"  @click="sfyrz" v-show="show1"><img class="img11" src="../../../public/img/11.png" alt=""/> {{ $t('home.sfyrz') }}</div>
 			<div class="wenzi">{{ $t('home.xtjj') }}<img class="img8" src="../../../public/img/8.png" alt="" /></div>
 			<div class="wenzi1">
 				{{ $t('home.jjxq') }}
@@ -22,11 +25,6 @@
 					<img class="img" src="../../../public/img/13.png" alt="警告" />
 				</div>
 			</div>
-
-			<!-- <Popout :show="show3">
-        风险提示: <br />
-        合成后无论是否成功卡牌都将销毁
-      </Popout> -->
 		</van-overlay>
 	</div>
 </template>
@@ -37,18 +35,36 @@ export default {
 		return {
 			show: false,
 			flag1: false, //认证
-			show: false
+			show: false,
+      show1: false,
 		};
 	},
+  created() {
+   this.show1= this.$parent.authTypeClick()==false?false:true
+  },
+ 
 	methods: {
 		/* 开始认证 */
 		ksrz() {
-			//	this.show = true;
-			this.$router.push({ path: 'accountstate/identity' });
+			this.show = true;
+			//this.$router.push({ path: '/accountstate/identity' });
+     // this.$router.push({ path:'/login'})
 		},
 		econfirmHandler() {
 			this.show = false;
-		}
+     // this.$router.push({ path:'/location/index'})
+this.$on('telegramClick',(val)=>{
+  console.log(1234)
+  console.log(val)
+})
+    if(!telegram){
+      console.log(123)
+    }else{
+      console.log(321)
+    }
+		},sfyrz(){
+      this.$router.push({ path: '/location/index'})
+    }
 	}
 };
 </script>
@@ -69,10 +85,15 @@ export default {
 	background-image: url('../../img/6.png');
 	box-sizing: border-box;
 	.img4 {
-		margin-bottom: 1rem;
+    width: 100%;
+    height: auto;
+		
 	}
 	.img5 {
-		margin-top: 1rem;
+    width: 100%;
+    height: auto;
+		margin: 200px 0;
+  
 	}
 	.img7 {
 		width: 5.65rem;
@@ -116,6 +137,7 @@ export default {
 	text-align: center;
 	font-size: 0.4rem;
 	background-color: #122d56;
+position: relative;
 	img {
 		width: 25px;
 		height: 25px;
@@ -179,5 +201,12 @@ export default {
 			transform: translate(-50%, 0%);
 		}
 	}
+}
+.icon-youjiantou{
+ 
+  font-size: 30px;
+  position: absolute;
+  top: 5px;
+  right: 30px;
 }
 </style>

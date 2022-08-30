@@ -58,7 +58,7 @@ import { SetTelegram } from '@/api/trxRequest';
 import { clearmymes } from '@/api/payverification';
 
 export default {
-	//账号信息
+
 	components: {
 		[Dialog.Component.name]: Dialog.Component
 	},

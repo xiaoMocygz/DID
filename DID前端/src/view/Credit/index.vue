@@ -20,7 +20,7 @@
 		</div>
 		<!-- 信用分流水 -->
 		<van-tabs v-model="active" background="#2E85F8" title-inactive-color="#8DC3F8" color="#ffffff" title-active-color="#FFFDFF">
-			<van-tab title-class="'title'" title="加分记录">
+			<van-tab title-class="title" title="加分记录">
 				<div class="center">
 					<div class="box" v-for="(item, index) in 10" :key="index">
 						<div class="box-left">
@@ -82,6 +82,7 @@ export default {
 <style lang="less" scoped>
 .title {
 	font-weight: bold;
+	font-size: 40px;
 }
 .content1 {
 	width: 100%;
@@ -97,11 +98,15 @@ export default {
 	/deep/ [class*='van-hairline']::after {
 		border: none;
 	}
+	/deep/ .van-tab__text {
+		font-size: 40px;
+	}
 	.grade {
 		display: flex;
 		justify-content: center;
 		background-color: #1b2945;
 		position: relative;
+
 		img {
 			position: absolute;
 			bottom: 0;
@@ -109,7 +114,7 @@ export default {
 			height: 25vw;
 		}
 		.text {
-			margin: 100px 0;
+			margin: 120px 0;
 			text-align: center;
 			color: #fff;
 			p:first-child {
@@ -124,8 +129,8 @@ export default {
 		.svgbox {
 			position: absolute;
 
-			width: 540px;
-			height: 540px;
+			width: 560px;
+			height: 560px;
 			.svg {
 				left: 25%;
 				width: 100%;
@@ -159,7 +164,6 @@ export default {
 				p:first-child {
 					font-size: 36px;
 					margin-bottom: 10px;
-					font-weight: bold;
 				}
 				p:last-child {
 					font-size: 28px;
@@ -169,6 +173,7 @@ export default {
 			.box-right {
 				display: flex;
 				align-items: center;
+				font-size: 40px;
 			}
 			.color-green {
 				color: #1d9c3f;

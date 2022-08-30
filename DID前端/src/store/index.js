@@ -8,29 +8,36 @@ import { baseUrl } from '@/utils/request';
 Vue.use(Vuex);
 
 const state = {
-	url: baseUrl,
-	merchantInfoMap: {},
-	userUid: getItem('uid'),
-	zh: {}
+  url: baseUrl,
+  merchantInfoMap: {},
+  userUid: getItem('uid'),
+  zh: {},
+  flag: false, email: '',
+  password: '',
+  token: '',
 };
-const actions = {};
+const actions = {
+  SET_TOKEN: ({ commit }, data) => {
+    console.log(commit)
+    console.log(data)
+  }
+};
 
 const mutations = {
-	setMerchantInfoMap(state, data) {
-		state.merchantInfoMap[data.it.odid] = data;
-	},
-
-	setRoute() {
-		this.$router.back();
-	}
+  setMerchantInfoMap (state, data) {
+    state.merchantInfoMap[data.it.odid] = data;
+  },
+  setFlag (state, data) {
+    state.flag = data
+  }
 };
 
 const getters = {};
 
 export default new Vuex.Store({
-	state,
-	actions,
-	mutations,
-	getters,
-	strict: true
+  state,
+  actions,
+  mutations,
+  getters,
+  strict: true
 });

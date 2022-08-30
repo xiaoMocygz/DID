@@ -1,4 +1,3 @@
-console.log('en');
 export default {
 	yuyan: {
 		Chinese: 'Chinese',

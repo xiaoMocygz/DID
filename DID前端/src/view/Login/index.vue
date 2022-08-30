@@ -31,15 +31,16 @@ export default {
 		};
 	},
 	mounted() {
+    var flag= window.tronWeb.defaultAddress.base58
+flag ?this.$store.commit('setFlag',true):this.$store.commit('setFlag',false);
 		if (window.tronWeb) {
 			this.tronWeb = window.tronWeb;
-			console.log(window.tronWeb);
-			this.walletAddress = this.tronWeb.defaultAddress.base58;
-			console.log(this.tronWeb.defaultAddress.base58);
+			this.walletAddress = this.tronWeb.defaultAddress.base58.toString();
 		}
-		if (this.$route.query.pid != undefined) {
-			this.actionShow = false;
-		}
+		// if (this.$route.query.pid != undefined) {
+		// 	this.actionShow = false;
+		// }
+
 	},
 	methods: {
 		asd() {
@@ -53,6 +54,7 @@ export default {
 				this.$refs.sig.verification = '';
 				this.$refs.sig.address = '';
 				this.$refs.sig.checked = false;
+        this.$refs.sig.invite=''
 			}
 		}
 	}
@@ -88,6 +90,7 @@ export default {
 		border-radius: 0px 20px 0px 0px;
 		padding: 98px 32px 60px;
 		position: relative;
+  
 		.out {
 			width: 320px;
 			height: 96px;
