@@ -65,8 +65,6 @@
       </div>
     </van-popup>
     <transition-page>
-      
-
       <router-view></router-view>
     </transition-page>
   </div>

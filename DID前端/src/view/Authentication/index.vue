@@ -105,9 +105,12 @@ export default {
 				{ icon: 'icon-shenfenxinxi', name: '身份信息' },
 				{ icon: 'icon-fukuanxinxi', name: '收付款信息', url: 'receiving/list' },
 				{ icon: 'icon-bangdinggongliandizhi', name: '各公链绑定地址', url: 'chain' },
-				{ icon: 'icon-bangdingxiangmu', name: '绑定各项目' },
-				{ icon: 'icon-lianxifangshi', name: '社区联系方式' },
-				{ icon: 'icon-tuandui', name: '团队' }
+				{ icon: 'icon-bangdingxiangmu', name: '绑定各项目',url:'projects'},
+				{ icon: 'icon-fukuanxinxi', name: '社区信息',url:'community/information' },
+				{ icon: 'icon-bangdingxiangmu', name: '申请创建社区' ,url:'community/create'},
+				{ icon: 'icon-lianxifangshi', name: '社区审批' },
+				{ icon: 'icon-tuandui', name: '我的团队' },
+				{ icon: 'icon-tuandui', name: '邀请好友' }
 			],
 			flag: true,
 			shenhe: false,
@@ -202,11 +205,12 @@ export default {
 }
 .signOut {
 	color: white;
-	font-size: 30px;
+	font-size: 32px;
 	text-align: center;
-	position: absolute;
-	left: 45%;
-	bottom: 60px;
+	// position: absolute;
+	// left: 45%;
+	// bottom: 60px;
+	margin: 30px 0px;
 }
 /deep/ .cell {
 	width: 90vw;
@@ -353,7 +357,7 @@ export default {
 	.custom-title {
 		color: white;
 		margin-left: 3vw;
-		font-size: 35px;
+		font-size: 30px;
 	}
 }
 #container {

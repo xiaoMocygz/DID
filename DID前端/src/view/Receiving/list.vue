@@ -99,7 +99,7 @@ export default {
 	name: 'set-receivingList',
 	components: {
 		CurCurrencyType,
-		titles
+		titles 
 	},
 	created() {
 		this.getCurPayList(this.sellerMthods);

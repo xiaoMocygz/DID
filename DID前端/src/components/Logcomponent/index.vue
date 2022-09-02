@@ -137,8 +137,8 @@ export default {
      if(code ==1)return this.$switch(message, '邮箱格式错误!' , '邮箱未注册!','密码错误!', '钱包地址错误!', '登录错误!')
       this.$Toast.success('登录成功')
       this.$cookie.set('email', this.email)
-       this.$cookie.set('password', this.password)
-       this.$cookie.set('token',items)
+      this.$cookie.set('password', this.password)
+      this.$cookie.set('token',items)
     // localStorage.setItem('email', this.email)
     // localStorage.setItem('password', this.password)
     // localStorage.setItem('token',items)
@@ -253,7 +253,7 @@ export default {
 .footer {
   width: 100%;
   height: auto;
-  margin-top: calc(35vh);
+  margin-top: calc(3vh);
   p {
     font-size: 28px;
     margin-top: 40px;
